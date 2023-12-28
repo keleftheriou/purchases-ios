@@ -455,15 +455,15 @@ private struct PresentingPaywallModifier: ViewModifier {
 
     @State
     private var data: Data?
-    
+
     @State
     private var taskHasRun = false
-    
+
     #if os(watchOS)
     // Sheets on watchOS add a close button automatically
-    private let defaultDisplayCloseButton = false
+    static private let defaultDisplayCloseButton = false
     #else
-    private let defaultDisplayCloseButton = true
+    static private let defaultDisplayCloseButton = true
     #endif
 
     func body(content: Content) -> some View {
@@ -540,7 +540,7 @@ private struct PresentingPaywallModifier: ViewModifier {
                 content: self.content,
                 customerInfo: data.customerInfo,
                 fonts: self.fontProvider,
-                displayCloseButton: defaultDisplayCloseButton,
+                displayCloseButton: Self.defaultDisplayCloseButton,
                 introEligibility: self.introEligibility,
                 purchaseHandler: self.purchaseHandler
             )
