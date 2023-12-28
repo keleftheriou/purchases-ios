@@ -44,6 +44,7 @@ struct LoadingPaywallView: View {
             mode: self.mode,
             fonts: DefaultPaywallFontProvider(),
             displayCloseButton: self.displayCloseButton,
+            dismiss: nil,
             introEligibility: Self.introEligibility,
             purchaseHandler: Self.purchaseHandler,
             locale: Locale.current,

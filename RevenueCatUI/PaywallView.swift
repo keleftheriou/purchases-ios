@@ -32,6 +32,26 @@ public struct PaywallView: View {
     private let paywallViewOwnsPurchaseHandler: Bool
     private let useDraftPaywall: Bool
 
+    // We save and pass down this DismissAction from here so as to fix an issue where
+    // the DismissAction is invalid/doesn't work on real watchOS devices, while it works
+    // on the Simulator.
+    // In particular, it looks like if this environment action is defined in the inner view
+    // where it's called from, we are at a state where `isPresented` is false.
+    // + is the new way, - is the old way.
+    //
+    //Device:
+    //+ DismissAction(_presentationMode: SwiftUI.Binding<SwiftUI.PresentationMode>(transaction: SwiftUI.Transaction(plist: []), location: SwiftUI.LocationBox<SwiftUI.(unknown context at $26284a44).ProjectedLocation<SwiftUI.LocationBox<SwiftUI.Binding<Swift.Optional<RevenueCatUI.(unknown context at $2c7df80).PresentingPaywallModifier.Data>>.(unknown context at $262bcddc).ScopedLocation>, SwiftUI.PresentationMode.FromItem<RevenueCatUI.(unknown context at $2c7df80).PresentingPaywallModifier.Data>>>, _value: SwiftUI.PresentationMode(isPresented: true)))
+    //
+    //- DismissAction(_presentationMode: SwiftUI.Binding<SwiftUI.PresentationMode>(transaction: SwiftUI.Transaction(plist: []), location: SwiftUI.LocationBox<SwiftUI.(unknown context at $2628f1b8).UIKitNavigationBridgePresentationModeLocation>, _value: SwiftUI.PresentationMode(isPresented: false)))
+    //
+    //Simulator:
+    //+ DismissAction(_presentationMode: SwiftUI.Binding<SwiftUI.PresentationMode>(transaction: SwiftUI.Transaction(plist: []), location: SwiftUI.LocationBox<SwiftUI.(unknown context at $1863c4d44).ProjectedLocation<SwiftUI.LocationBox<SwiftUI.Binding<Swift.Optional<RevenueCatUI.(unknown context at $100c1dc38).PresentingPaywallModifier.Data>>.(unknown context at $1863fd00c).ScopedLocation>, SwiftUI.PresentationMode.FromItem<RevenueCatUI.(unknown context at $100c1dc38).PresentingPaywallModifier.Data>>>, _value: SwiftUI.PresentationMode(isPresented: true)))
+    //
+    //- DismissAction(_presentationMode: SwiftUI.Binding<SwiftUI.PresentationMode>(transaction: SwiftUI.Transaction(plist: []), location: SwiftUI.LocationBox<SwiftUI.UIKitPresentationModeLocation<SwiftUI.(unknown context at $186403db8).BridgedNavigationView.RootView>>, _value: SwiftUI.PresentationMode(isPresented: true)))
+    
+    @Environment(\.dismiss)
+    private var dismiss
+
     @StateObject
     private var internalPurchaseHandler: PurchaseHandler
 
@@ -227,6 +247,7 @@ public struct PaywallView: View {
                                      activelySubscribedProductIdentifiers: customerInfo.activeSubscriptions,
                                      fonts: self.fonts,
                                      checker: self.introEligibility,
+                                     dismiss: dismiss,
                                      purchaseHandler: self.purchaseHandler)
                     .transition(Self.transition)
                 } else {
@@ -285,6 +306,7 @@ public struct PaywallView: View {
         activelySubscribedProductIdentifiers: Set<String>,
         fonts: PaywallFontProvider,
         checker: TrialOrIntroEligibilityChecker,
+        dismiss: DismissAction,
         purchaseHandler: PurchaseHandler
     ) -> some View {
 
@@ -310,6 +332,7 @@ public struct PaywallView: View {
                     mode: self.mode,
                     fonts: fonts,
                     displayCloseButton: self.displayCloseButton,
+                    dismiss: dismiss,
                     introEligibility: checker,
                     purchaseHandler: purchaseHandler,
                     locale: purchaseHandler.preferredLocaleOverride ?? .current,
@@ -369,6 +392,7 @@ public struct PaywallView: View {
                 mode: self.mode,
                 fonts: fonts,
                 displayCloseButton: self.displayCloseButton,
+                dismiss: dismiss,
                 introEligibility: checker,
                 purchaseHandler: purchaseHandler,
                 locale: displayedLocale,
@@ -502,8 +526,7 @@ struct LoadedOfferingPaywallView: View {
     @Environment(\.colorScheme)
     private var colorScheme
 
-    @Environment(\.dismiss)
-    private var dismiss
+    private let dismiss: DismissAction!
 
     init(
         offering: Offering,
@@ -513,6 +536,7 @@ struct LoadedOfferingPaywallView: View {
         mode: PaywallViewMode,
         fonts: PaywallFontProvider,
         displayCloseButton: Bool,
+        dismiss: DismissAction!,
         introEligibility: TrialOrIntroEligibilityChecker,
         purchaseHandler: PurchaseHandler,
         locale: Locale,
@@ -525,6 +549,7 @@ struct LoadedOfferingPaywallView: View {
         self.mode = mode
         self.fonts = fonts
         self.displayCloseButton = displayCloseButton
+        self.dismiss = dismiss
         self._introEligibility = .init(
             wrappedValue: .init(introEligibilityChecker: introEligibility)
         )
