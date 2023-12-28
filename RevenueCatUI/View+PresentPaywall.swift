@@ -179,6 +179,11 @@ private struct PresentingPaywallModifier: ViewModifier {
                 )
                 .onPurchaseCompleted {
                     self.purchaseCompleted?($0)
+                    
+                    // Should we also have this here, instead of needing to pass DismissAction down?
+                    //if !self.shouldDisplay(customerInfo) {
+                    //    self.close()
+                    //}
                 }
                 .onRestoreCompleted { customerInfo in
                     self.restoreCompleted?(customerInfo)
