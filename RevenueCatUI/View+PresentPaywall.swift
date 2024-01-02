@@ -166,6 +166,9 @@ private struct PresentingPaywallModifier: ViewModifier {
     @State
     private var data: Data?
     
+    @State
+    private var taskHasRun = false
+    
     #if os(watchOS)
     // Sheets on watchOS add a close button automatically
     static private let defaultDisplayCloseButton = false
@@ -201,6 +204,10 @@ private struct PresentingPaywallModifier: ViewModifier {
                 }
             }
             .task {
+                // Prevent paywall always re-appearing after cancelling on watchOS <= 9
+                guard !taskHasRun else { return }
+                defer { taskHasRun = true }
+                
                 guard let info = try? await self.customerInfoFetcher() else { return }
 
                 Logger.debug(Strings.determining_whether_to_display_paywall)
