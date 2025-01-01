@@ -456,6 +456,9 @@ private struct PresentingPaywallModifier: ViewModifier {
     @State
     private var data: Data?
     
+    @State
+    private var taskHasRun = false
+    
     #if os(watchOS)
     // Sheets on watchOS add a close button automatically
     private let defaultDisplayCloseButton = false
@@ -490,6 +493,10 @@ private struct PresentingPaywallModifier: ViewModifier {
             }
         }
         .task {
+            // Prevent paywall always re-appearing after cancelling on watchOS <= 9
+            guard !taskHasRun else { return }
+            defer { taskHasRun = true }
+
             await self.updateCustomerInfo()
         }
         .onChangeOfWithChange(self.scenePhase) { value in
@@ -541,8 +548,12 @@ private struct PresentingPaywallModifier: ViewModifier {
         .onPurchaseStarted {
             self.purchaseStarted?($0)
         }
-        .onPurchaseCompleted {
-            self.purchaseCompleted?($0)
+        .onPurchaseCompleted { transaction in
+            self.purchaseCompleted?(transaction)
+
+            if !self.shouldDisplay(transaction.customerInfo) {
+                self.close()
+            }
         }
         .onPurchaseCancelled {
             self.purchaseCancelled?()
