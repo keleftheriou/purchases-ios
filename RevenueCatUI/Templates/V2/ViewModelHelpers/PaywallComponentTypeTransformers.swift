@@ -354,7 +354,9 @@ extension DisplayableColorScheme {
         })
         #elseif os(watchOS) || os(macOS)
         // For platforms where `UIColor` is unavailable, fallback to using the light or dark color directly
-        let currentColorScheme = (Environment(\.colorScheme).wrappedValue)
+        // kosta: hardcoded to ColorScheme.dark to prevent this error:
+        // "Accessing Environment<ColorScheme>'s value outside of being installed on a View. This will always read the default value and will not update."
+        let currentColorScheme = ColorScheme.dark // (Environment(\.colorScheme).wrappedValue)
         return effectiveColor(for: currentColorScheme).toColor(fallback: Color.clear)
         #endif
     }
