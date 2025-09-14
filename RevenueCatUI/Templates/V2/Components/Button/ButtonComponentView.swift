@@ -116,10 +116,14 @@ struct ButtonComponentView: View {
         let (customerInfo, success) = try await self.purchaseHandler.restorePurchases()
         if success {
             Logger.debug(Strings.restored_purchases)
-            self.purchaseHandler.setRestored(customerInfo)
         } else {
             Logger.debug(Strings.restore_purchases_with_empty_result)
         }
+        
+        // kosta: moved this out of the success condition (which merely indicates "no error"),
+        // so that onRestoreCompleted will be called even if there was no subscription found.
+        // ⚠️ In contrast with V1 restore button in FooterView.swift, there are no alerts here!
+        self.purchaseHandler.setRestored(customerInfo)
     }
 
     private func navigateTo(destination: ButtonComponentViewModel.Destination) {

@@ -583,7 +583,7 @@ extension EnvironmentValues {
 
 // MARK: -
 
-private extension CustomerInfo {
+extension CustomerInfo {
 
     var hasActiveSubscriptionsOrNonSubscriptions: Bool {
         return !self.activeSubscriptions.isEmpty || !self.nonSubscriptions.isEmpty

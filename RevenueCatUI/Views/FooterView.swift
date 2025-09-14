@@ -207,11 +207,14 @@ private struct RestorePurchasesButton: View {
 
             if success {
                 Logger.debug(Strings.restored_purchases)
-                self.restoredCustomerInfo = customerInfo
-                self.showRestoredCustomerInfoAlert = true
             } else {
                 Logger.debug(Strings.restore_purchases_with_empty_result)
             }
+
+            // kosta: moved this out of the success condition (which merely indicates "no error"),
+            // so that an appropriate alert will be shown even if there was no subscription found.
+            self.restoredCustomerInfo = customerInfo
+            self.showRestoredCustomerInfoAlert = true
         } label: {
             let largestText = Text("Restore purchases", bundle: self.localizedBundle)
 
@@ -227,7 +230,8 @@ private struct RestorePurchasesButton: View {
         }
         .frame(minHeight: Constants.minimumButtonHeight)
         .buttonStyle(.plain)
-        .alert(Text("Purchases restored successfully!", bundle: self.localizedBundle),
+        .alert(Text(restoredCustomerInfo?.hasActiveSubscriptionsOrNonSubscriptions == true ?
+                    "Purchases restored successfully" : "No active purchases found", bundle: self.localizedBundle),
                isPresented: self.$showRestoredCustomerInfoAlert) {
             Button(role: .cancel) {
                 if let restoredCustomerInfo = self.restoredCustomerInfo {
