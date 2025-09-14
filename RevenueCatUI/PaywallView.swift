@@ -312,6 +312,7 @@ public struct PaywallView: View {
         )
 
         if let paywallComponents = useDraftPaywall ? offering.draftPaywallComponents : offering.paywallComponents {
+            // Paywalls V2
 
             // For fallback view or footer
             let paywall: PaywallData = .createDefault(with: offering.availablePackages,
@@ -375,6 +376,8 @@ public struct PaywallView: View {
                 )
             }
         } else {
+            // Paywalls V1
+
             #if os(macOS)
             DebugErrorView("Legacy paywalls are unsupported on macOS.", releaseBehavior: .errorView)
             #else
