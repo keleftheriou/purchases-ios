@@ -81,9 +81,6 @@ public struct PaywallView: View {
     @Environment(\.onRequestedDismissal)
     private var onRequestedDismissal: (() -> Void)?
 
-    @Environment(\.dismiss)
-    private var dismiss
-
     /// Create a view to display the paywall in `Offerings.current`.
     ///
     /// - Parameter fonts: An optional ``PaywallFontProvider``.
@@ -349,6 +346,7 @@ public struct PaywallView: View {
                     mode: self.mode,
                     fonts: fonts,
                     displayCloseButton: self.displayCloseButton,
+                    dismiss: dismiss,
                     introEligibility: checker,
                     purchaseHandler: purchaseHandler,
                     locale: purchaseHandler.preferredLocaleOverride ?? .current,

@@ -47,6 +47,7 @@ struct DataForV1DefaultPaywall {
     let mode: PaywallViewMode
     let fonts: PaywallFontProvider
     let displayCloseButton: Bool
+    let dismiss: DismissAction?
     let introEligibility: TrialOrIntroEligibilityChecker
     let purchaseHandler: PurchaseHandler
     let locale: Locale
@@ -74,6 +75,7 @@ enum FallbackContent {
                 mode: data.mode,
                 fonts: data.fonts,
                 displayCloseButton: data.displayCloseButton,
+                dismiss: data.dismiss,
                 introEligibility: data.introEligibility,
                 purchaseHandler: data.purchaseHandler,
                 locale: data.locale,
