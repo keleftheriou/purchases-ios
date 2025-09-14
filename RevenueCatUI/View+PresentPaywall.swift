@@ -548,10 +548,10 @@ private struct PresentingPaywallModifier: ViewModifier {
         .onPurchaseStarted {
             self.purchaseStarted?($0)
         }
-        .onPurchaseCompleted { transaction in
-            self.purchaseCompleted?(transaction)
+        .onPurchaseCompleted { _, customerInfo in
+            self.purchaseCompleted?(customerInfo)
 
-            if !self.shouldDisplay(transaction.customerInfo) {
+            if !self.shouldDisplay(customerInfo) {
                 self.close()
             }
         }
